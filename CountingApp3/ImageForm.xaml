@@ -1,0 +1,434 @@
+﻿ <Window x:Class="CountingApp3.ImageForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CountingApp3"
+        mc:Ignorable="d"
+        WindowStyle="SingleBorderWindow"
+        ShowActivated="False"
+        FocusManager.FocusedElement="{Binding ElementName=ImageScrollViewer}"
+        Icon="pack://application:,,,/Resources/favicon.ico"
+        AllowDrop="True"
+        Title="{Binding ImageName}">
+    <Window.Resources>
+        <local:InverseConverter x:Key="InverseConverter"/>
+        <local:EllipsePositionConverter x:Key="PositionConverter"/>
+        <local:BoolToVisibilityConverter x:Key="VisibilityConverter"/>
+        <local:PointsToThicknessConverter x:Key="ThicknessConverter"/>
+        <local:PointsToWidthConverter x:Key="WidthConverter"/>
+        <local:PointsToHeightConverter x:Key="HeightConverter"/>
+        <local:ScaleFactorToPercentageConverter x:Key="ZoomConverter"/>
+        <local:ActualMarkSizeConverter x:Key="ActualMarkSizeConverter"/>
+        <Path x:Key="DropDownArrow" x:Shared="False"  VerticalAlignment="Center" Margin="3" Fill="Black" Data="M 0 0 L 3 3 L 6 0 Z"/>
+        <Style TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <EventSetter Event="KeyDown" Handler="TextBox_KeyDown"/>
+        </Style>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Open" 
+                        Executed="CommandOpen_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Undo" 
+                        Executed="CommandUndo_Executed" 
+                        CanExecute="CommandUndo_CanExecute"/>
+        <CommandBinding Command="ApplicationCommands.Redo" 
+                        Executed="CommandRedo_Executed" 
+                        CanExecute="CommandRedo_CanExecute"/>
+        <CommandBinding Command="ApplicationCommands.Delete" 
+                        Executed="CommandDelete_Executed"
+                        CanExecute="CommandDelete_CanExecute"/>
+        <CommandBinding Command="ApplicationCommands.Save" 
+                        Executed="CommandSave_Executed"/>
+        <CommandBinding Command="ApplicationCommands.SaveAs" 
+                        Executed="CommandSaveAs_Executed"/>
+        <CommandBinding Command="local:CustomCommands.SaveAll"
+                        Executed="CommandSaveAll_Executed"/>
+        <CommandBinding Command="ApplicationCommands.Copy" 
+                        Executed="CommandCopy_Executed" 
+                        CanExecute="CommandCopy_CanExecute"/>
+        <CommandBinding Command="local:CustomCommands.Escape"
+                        Executed="CommandEscape_Executed"/>
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ToolBarTray Grid.Row="0"
+                     Visibility="{Binding Parent.ShowImageMenus, Converter={StaticResource VisibilityConverter}}">
+            <ToolBar>
+                <Button Command="ApplicationCommands.Open" ToolTip="Open an image file in a new window.">
+                    <Image Source="pack://application:,,,/Resources/FolderOpen_16x.png"/>
+                </Button>
+                <Menu Background="Transparent">
+                    <MenuItem ToolTip="Save, Save As, or Overlay">
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <Image Source="pack://application:,,,/Resources/Save_16x.png"/>
+                                <ContentControl Content="{Binding Source={StaticResource DropDownArrow}}"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                        <MenuItem Header="Save" 
+                                  Command="ApplicationCommands.Save"
+                                  ToolTip="Save">
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/Save_16x.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Save As" 
+                                  Command="ApplicationCommands.SaveAs"
+                                  ToolTip="Save As...">
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/SaveAs_16x.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Overlay" 
+                                  Click="MenuOverlay_Click" 
+                                  ToolTip="Save the count marks and lines embedded into the image.">
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/ImageChisel_16x.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+                <StackPanel>
+                    <TextBox Width="40"
+                             Margin="0"
+                             Padding="0" 
+                             ToolTip="Manually set the zoom amount"
+                             Text="{Binding ScaleFactor, Converter={StaticResource ZoomConverter}, UpdateSourceTrigger=PropertyChanged, FallbackValue=100}"/>
+                    <TextBlock Text="%"/>
+                </StackPanel>
+                <Menu Background="Transparent">
+                    <MenuItem ToolTip="Zoom options">
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <ContentControl Content="{Binding Source={StaticResource DropDownArrow}}"/>
+                                <TextBlock Visibility="Hidden"/> <!-- force the MenuItem to vertically fill because VerticalAlignment = Stretch and VerticalContentAlignment = Stretch do not work at any level -->
+                            </StackPanel>
+                        </MenuItem.Header>
+                        <MenuItem Header="Fit to window" 
+                                  ToolTip="Scale the image to fit inside the window"
+                                  Click="MenuFitToWindow_Click">
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/FitSelection_16x.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Scale all images"
+                                  ToolTip="Scale all images to match this zoom amount"
+                                  Click="MenuFitAll_Click">
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/ImageStack_16x.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+                <Menu Background="Transparent">
+                    <MenuItem ToolTip="Change brightness and contrast">
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <Image Source="pack://application:,,,/Resources/Brightness_16x.png"/>
+                                <ContentControl Content="{Binding Source={StaticResource DropDownArrow}}"/>
+                            </StackPanel>
+                        </MenuItem.Header>
+                        <MenuItem>
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/Brightness_16x.png"/>
+                            </MenuItem.Icon>
+                            <MenuItem.Header>
+                                <Slider x:Name="brightnessValue"
+                                        Minimum="-1"
+                                        Maximum="1"
+                                        TickFrequency="0.1"
+                                        Width="100"/>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem>
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/Contrast_16x.png"/>
+                            </MenuItem.Icon>
+                            <MenuItem.Header>
+                                <Slider x:Name="contrastValue"
+                                        Minimum="-1"
+                                        Maximum="1"
+                                        TickFrequency="0.1"
+                                        Width="100"/>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem Header="Reset" 
+                                Click="MenuResetBAndR_Click"
+                                StaysOpenOnClick="True">
+                            <MenuItem.Icon>
+                                <Image Source="pack://application:,,,/Resources/RestoreImage_16x.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+            <ToolBar>
+                <Button Command="ApplicationCommands.Undo" 
+                        ToolTip="Undo Ctrl+Z"
+                        ToolTipService.ShowOnDisabled="True">
+                    <Image Source="pack://application:,,,/Resources/Undo_16x.png"/>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.2"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Command="ApplicationCommands.Redo" 
+                        ToolTip="Redo Ctrl+Y" 
+                        ToolTipService.ShowOnDisabled="True">
+                    <Image Source="pack://application:,,,/Resources/Redo_16x.png"/>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.2"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Command="ApplicationCommands.Copy" 
+                        ToolTip="Copy the selection as a new file Ctrl+C" 
+                        ToolTipService.ShowOnDisabled="True">
+                    <Image Source="pack://application:,,,/Resources/CopyToClipboard_16x.png"/>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.2"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Command="ApplicationCommands.Delete" 
+                        ToolTip="Delete the selected items Ctrl+Delete" 
+                        ToolTipService.ShowOnDisabled="True">
+                    <Image Source="pack://application:,,,/Resources/DeleteBreakpoint_16x.png"/>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.2"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </ToolBar>
+            <ToolBar ItemsSource="{Binding CollectionInputs}">
+                <ToolBar.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="0,0,3,0">
+                            <TextBlock Text="{Binding Column, StringFormat={}{0}:}"
+                                       Margin="0,0,3,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" TextChanged="TextBox_TextChanged" Width="100"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ToolBar.ItemTemplate>
+            </ToolBar>
+        </ToolBarTray>
+        <StatusBar Grid.Row="1" 
+                   ItemsSource="{Binding CollectionCounts}"
+                   Visibility="{Binding Parent.ShowImageMenus, Converter={StaticResource VisibilityConverter}}">
+            <StatusBar.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="3,0">
+                        <TextBlock Text="{Binding Key}"/>
+                        <TextBlock Text=": "/>
+                        <TextBlock Text="{Binding Value.Value}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </StatusBar.ItemTemplate>
+        </StatusBar>
+        <ScrollViewer x:Name="ImageScrollViewer" 
+                      Grid.Row="2"
+                      Cursor="{Binding Parent.ActiveTool.Cursor}"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto"
+                      SizeChanged="ImageScrollViewer_SizeChanged"
+                      FocusVisualStyle="{x:Null}">
+            <Grid MouseLeftButtonDown="Grid_MouseLeftButtonDown"
+                  MouseMove="Grid_MouseMove"
+                  MouseLeftButtonUp="Grid_MouseLeftButtonUp"
+                  MouseWheel="Grid_MouseWheel"
+                  MouseRightButtonUp="Grid_MouseRightButtonUp">
+                <Grid.LayoutTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="{Binding ScaleFactor}" ScaleY="{Binding ScaleFactor}"/>
+                    </TransformGroup>
+                </Grid.LayoutTransform>
+                <Image x:Name = "ImageElement"
+                       Source="{Binding ActiveImage}"
+                       Stretch="None"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       RenderOptions.BitmapScalingMode="NearestNeighbor">
+                    <Image.Effect>
+                        <local:ShaderEffects Brightness="{Binding ElementName=brightnessValue, Path=Value}"
+                                             Contrast="{Binding ElementName=contrastValue, Path=Value}"/>
+                    </Image.Effect>
+                    <Image.LayoutTransform>
+                        <ScaleTransform ScaleX="{Binding SubScale}" ScaleY="{Binding SubScale}"/>
+                    </Image.LayoutTransform>
+                </Image>
+                <ItemsControl ItemsSource="{Binding CollectionUIElements}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type local:LineMark}">
+                            <Path Data="{Binding Geometry}">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="StrokeThickness">
+                                            <Setter.Value>
+                                                <MultiBinding Converter="{StaticResource ActualMarkSizeConverter}">
+                                                    <Binding Path="DataContext.Parent.CountDiameter" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                    <Binding Path="DataContext.ScaleFactor" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                    <Binding Source="2"/>
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Stroke" Value="Red"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Stroke" Value="White"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type local:CountMark}">
+                            <Ellipse Fill="{Binding Button.Brush}">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Width">
+                                            <Setter.Value>
+                                                <MultiBinding Converter="{StaticResource ActualMarkSizeConverter}">
+                                                    <Binding Path="DataContext.Parent.CountDiameter" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                    <Binding Path="DataContext.ScaleFactor" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Height">
+                                            <Setter.Value>
+                                                <MultiBinding Converter="{StaticResource ActualMarkSizeConverter}">
+                                                    <Binding Path="DataContext.Parent.CountDiameter" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                    <Binding Path="DataContext.ScaleFactor" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Margin">
+                                            <Setter.Value>
+                                                <MultiBinding Converter="{StaticResource PositionConverter}">
+                                                    <Binding Path="Location"/>
+                                                    <Binding Path="DataContext.Parent.CountDiameter" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                    <Binding Path="DataContext.ScaleFactor" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Stroke" 
+                                                    Value="White"/>
+                                        <Setter Property="StrokeThickness" 
+                                                    Value="0"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="StrokeThickness">
+                                                    <Setter.Value>
+                                                        <MultiBinding Converter="{StaticResource ActualMarkSizeConverter}">
+                                                            <Binding Path="DataContext.Parent.CountDiameter" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                                            <Binding Path="DataContext.ScaleFactor" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                            <Binding Source="4"/>
+                                                        </MultiBinding>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Button.IsVisible}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
+                </ItemsControl>
+                <Rectangle VerticalAlignment="Top"
+                                HorizontalAlignment="Left" 
+                                Stroke="Black" 
+                                StrokeDashArray="4 4" 
+                                Visibility="{Binding SelectionVisible, Converter={StaticResource VisibilityConverter}}">
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="StrokeThickness">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource ActualMarkSizeConverter}">
+                                        <Binding Source="5"/>
+                                        <Binding Path="DataContext.ScaleFactor" RelativeSource="{RelativeSource AncestorType={x:Type Window}}"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Margin">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource ThicknessConverter}">
+                                        <Binding Path="SelectionStart"/>
+                                        <Binding Path="SelectionEnd"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Width">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource WidthConverter}">
+                                        <Binding Path="SelectionStart"/>
+                                        <Binding Path="SelectionEnd"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Height">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{StaticResource HeightConverter}">
+                                        <Binding Path="SelectionStart"/>
+                                        <Binding Path="SelectionEnd"/>
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+            </Grid>
+        </ScrollViewer>
+        <!--<StatusBar Grid.Row="2" 
+                   ItemsSource="{Binding CollectionCounts}"
+                   Visibility="{Binding Parent.ShowImageMenus, Converter={StaticResource VisibilityConverter}}">
+            <StatusBar.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="3,0">
+                        <TextBlock Text="{Binding Key}"/>
+                        <TextBlock Text=": "/>
+                        <TextBlock Text="{Binding Value.Value}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </StatusBar.ItemTemplate>
+        </StatusBar>-->
+    </Grid>
+</Window>

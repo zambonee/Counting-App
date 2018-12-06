@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AB80171B-BD53-442A-9961-9BE139381DD6}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>CountingApp3</RootNamespace>
+    <AssemblyName>CountingApp3</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\favicon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="ImageForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Converters.cs" />
+    <Compile Include="ImageForm.xaml.cs">
+      <DependentUpon>ImageForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="KeyboardListener.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="OleDBStringBuilder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Resource Include="Resources\SaveAs_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OleDBStringBuilder.xaml.cs">
+      <DependentUpon>OleDBStringBuilder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PixelShader.ps" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="ShaderProject\Debug\ShaderProject.Build.CppClean.log" />
+    <None Include="ShaderProject\Debug\ShaderProject.log" />
+    <None Include="ShaderProject\Debug\ShaderProject.tlog\fxc.command.1.tlog" />
+    <None Include="ShaderProject\Debug\ShaderProject.tlog\fxc.read.1.tlog" />
+    <None Include="ShaderProject\Debug\ShaderProject.tlog\fxc.write.1.tlog" />
+    <None Include="ShaderProject\Debug\ShaderProject.tlog\ShaderProject.lastbuildstate" />
+    <None Include="ShaderProject\Debug\ShaderProject.tlog\ShaderProject.write.1u.tlog" />
+    <None Include="ShaderProject\Release\ShaderProject.Build.CppClean.log" />
+    <None Include="ShaderProject\Release\ShaderProject.log" />
+    <None Include="ShaderProject\Release\ShaderProject.tlog\FXC.command.1.tlog" />
+    <None Include="ShaderProject\Release\ShaderProject.tlog\fxc.read.1.tlog" />
+    <None Include="ShaderProject\Release\ShaderProject.tlog\FXC.write.1.tlog" />
+    <None Include="ShaderProject\Release\ShaderProject.tlog\ShaderProject.lastbuildstate" />
+    <None Include="ShaderProject\Release\ShaderProject.tlog\ShaderProject.write.1u.tlog" />
+    <None Include="ShaderProject\ShaderProject.vcxproj" />
+    <None Include="ShaderProject\ShaderProject.vcxproj.filters" />
+    <None Include="ShaderProject\x64\Debug\ShaderProject.log" />
+    <None Include="ShaderProject\x64\Debug\ShaderProject.tlog\FXC.command.1.tlog" />
+    <None Include="ShaderProject\x64\Debug\ShaderProject.tlog\fxc.read.1.tlog" />
+    <None Include="ShaderProject\x64\Debug\ShaderProject.tlog\FXC.write.1.tlog" />
+    <None Include="ShaderProject\x64\Debug\ShaderProject.tlog\ShaderProject.lastbuildstate" />
+    <None Include="ShaderProject\x64\Debug\ShaderProject.tlog\ShaderProject.write.1u.tlog" />
+    <None Include="ShaderProject\x64\Debug\ShaderProject.tlog\unsuccessfulbuild" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\FolderOpen_16x.png" />
+    <Resource Include="Resources\SaveAll_16x.png" />
+    <Resource Include="Resources\Save_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Brightness_16x.png" />
+    <Resource Include="Resources\Contrast_16x.png" />
+    <Resource Include="Resources\CopyToClipboard_16x.png" />
+    <Resource Include="Resources\EditPage_16x.png" />
+    <Resource Include="Resources\Edit_16x.png" />
+    <Resource Include="Resources\FitSelection_16x.png" />
+    <Resource Include="Resources\HamburgerMenu_16x.png" />
+    <Resource Include="Resources\ImageChisel_16x.png" />
+    <Resource Include="Resources\ImageStack_16x.png" />
+    <Resource Include="Resources\Pen2_16x.png" />
+    <Resource Include="Resources\Pen4_16x.png" />
+    <Resource Include="Resources\Redo_16x.png" />
+    <Resource Include="Resources\Select_16x.png" />
+    <Resource Include="Resources\Undo_16x.png" />
+    <Resource Include="Resources\ZoomControl_16x.png" />
+    <Resource Include="Resources\ZoomToFit_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\RestoreImage_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\DeleteBreakpoint_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ResultToText_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WriteToDatabase_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\CloseDocumentGroup_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Close_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AddDataSource_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\BreakpointXHR_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\CloakHide_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\favicon.ico" />
+    <Content Include="ShaderProject\PixelShader.hlsl" />
+    <Content Include="ShaderProject\ShaderProject.vcxproj.user" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

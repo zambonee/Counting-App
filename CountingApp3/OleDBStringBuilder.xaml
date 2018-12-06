@@ -1,0 +1,144 @@
+﻿<Window x:Class="CountingApp3.OleDBStringBuilder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CountingApp3"
+        mc:Ignorable="d"
+        Title="Data Source Connection" Width="300"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow"
+        SizeToContent="Height">
+    <Window.DataContext>
+        <local:OleDBBuilderContext/>
+    </Window.DataContext>
+    <Window.Resources>
+        <local:EnumBoolConverter x:Key="EnumBoolConverter"/>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="50"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+        </Style>
+        <Style TargetType="RadioButton">
+            <Setter Property="Margin" Value="0,0,5,0"/>
+        </Style>
+    </Window.Resources>
+    <StackPanel Margin="3">
+        <TextBlock TextWrapping="Wrap">
+            Create a connection string, including setting your user name and password for this session. 
+            Do not save your password to the config file.
+        </TextBlock>
+        <Separator/>
+        <TextBlock>Connection Type:</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+            <StackPanel>
+                <RadioButton IsChecked="{Binding Type, Converter={StaticResource EnumBoolConverter}, ConverterParameter={x:Static local:TypeOptions.SQLServer}}">SQL Server</RadioButton>
+                <RadioButton IsChecked="{Binding Type, Converter={StaticResource EnumBoolConverter}, ConverterParameter={x:Static local:TypeOptions.Oracle}}">Oracle</RadioButton>
+            </StackPanel>
+            <StackPanel>
+                <RadioButton IsChecked="{Binding Type, Converter={StaticResource EnumBoolConverter}, ConverterParameter={x:Static local:TypeOptions.PostgreSQL}}">PostgreSQL</RadioButton>
+                <RadioButton IsChecked="{Binding Type, Converter={StaticResource EnumBoolConverter}, ConverterParameter={x:Static local:TypeOptions.Excel}}">Excel File</RadioButton>
+            </StackPanel>
+            <RadioButton IsChecked="{Binding Type, Converter={StaticResource EnumBoolConverter}, ConverterParameter={x:Static local:TypeOptions.OleDBString}}">Connection String</RadioButton>
+        </StackPanel>
+        <StackPanel>
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Type}" Value="{x:Static local:TypeOptions.OleDBString}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <TextBlock>Connection String:</TextBlock>
+            <TextBox Text="{Binding OleDBString}" TextWrapping="Wrap"/>
+        </StackPanel>
+        <StackPanel>
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Visible"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Type}" Value="{x:Static local:TypeOptions.OleDBString}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <StackPanel>
+                <TextBlock>
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="Server:"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="{x:Static local:TypeOptions.Excel}">
+                                    <Setter Property="Text" Value="File Name:"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBox Text="{Binding Server}"/>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Type}" Value="{x:Static local:TypeOptions.PostgreSQL}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock>Port:</TextBlock>
+                <TextBox Text="{Binding Port}"/>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Type}" Value="{x:Static local:TypeOptions.Excel}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="{x:Static local:TypeOptions.Oracle}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock>Database:</TextBlock>
+                    <TextBox Text="{Binding Database}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock>User Name (leave blank for Integrated Security):</TextBlock>
+                    <TextBox Text="{Binding UserName}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock>Password:</TextBlock>
+                    <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+            <Button Content="Cancel" IsCancel="True"/>
+            <Button Content="Apply" Click="ButtonApply_Click"/>
+            <Button Content="Save" IsDefault="True" Click="ButtonSave_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

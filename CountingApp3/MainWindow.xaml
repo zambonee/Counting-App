@@ -1,0 +1,193 @@
+﻿
+    <Window x:Class="CountingApp3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CountingApp3"
+        mc:Ignorable="d"
+        SizeToContent="WidthAndHeight"
+        MaxHeight="500"
+        Topmost="True"
+        Left="0"
+        Top="0"
+        ShowInTaskbar="False"
+        Icon="pack://application:,,,/Resources/favicon.ico"
+        AllowDrop="True"
+        WindowStyle="ToolWindow">
+    <Window.DataContext>
+        <local:MainDataContext/>
+    </Window.DataContext>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Open" Executed="CommandOpen_Executed"/>
+        <CommandBinding Command="local:CustomCommands.SaveAll" Executed="CommandSaveAll_Executed"/>
+    </Window.CommandBindings>
+    <Window.Resources>
+        <local:InverseConverter x:Key="InverseConverter"/>
+        <Style x:Key="RadioButtonListBoxStyle" TargetType="{x:Type ListBox}">
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="KeyboardNavigation.DirectionalNavigation" Value="Cycle"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <ToggleButton IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Mode=TwoWay}"
+                                      HorizontalContentAlignment="Left"
+                                      BorderBrush="Transparent"
+                                      Background="Transparent"                                      
+                                      IsHitTestVisible="False"
+                                      >
+                            <ToggleButton.Style>
+                                <Style TargetType="ToggleButton">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                            <Setter Property="Opacity" Value="0.2"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                            <ToggleButton.Content>
+                                <DockPanel>
+                                    <Ellipse Fill="{Binding Brush}"
+                                             Height="10"
+                                             Width="10"
+                                             Stroke="Black"
+                                             StrokeThickness="1">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Color}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock>
+                                        <ContentPresenter Content="{Binding DisplayCategory, Mode=OneTime}"/>
+                                    </TextBlock>
+                                </DockPanel>
+                            </ToggleButton.Content>
+                        </ToggleButton>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem>
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="pack://application:,,,/Resources/HamburgerMenu_16x.png"/>
+                        <TextBlock Text="Menu"/>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Header="Open" Command="ApplicationCommands.Open">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/FolderOpen_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save All" Command="local:CustomCommands.SaveAll">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/SaveAll_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Overlay All" Click="MenuOverlayAll_Click">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/ImageChisel_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Export All Into...">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/ResultToText_16x.png"/>
+                    </MenuItem.Icon>
+                    <MenuItem Header="File" Click="MenuExportIntoFile_Click">
+                        <MenuItem.Icon>
+                            <Image Source="pack://application:,,,/Resources/ResultToText_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Database" Click="MenuExportIntoDatabase_Click">
+                        <MenuItem.Icon>
+                            <Image Source="pack://application:,,,/Resources/WriteToDatabase_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Database Connection" Click="MenuDatabaseConnection_Click">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/AddDataSource_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Show Image Menus"                          
+                          IsCheckable="True" 
+                          IsChecked="{Binding ShowImageMenus}"
+                          StaysOpenOnClick="True">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/CloakHide_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem StaysOpenOnClick="True">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/BreakPointXHR_16x.png"/>
+                    </MenuItem.Icon>
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Dot Size: " VerticalAlignment="Center"/>
+                            <Button MinWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}" Content="-" Click="ButtonDotSizeSmaller_Click"/>
+                            <Button MinWidth="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}" Content="+" Click="ButtonDotSizeEmbiggen_Click"/>
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Close All" Click="MenuCloseAll_Click">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/CloseDocumentGroup_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Exit" Click="MenuExit_Click">
+                    <MenuItem.Icon>
+                        <Image Source="pack://application:,,,/Resources/Close_16x.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ListBox Style="{StaticResource RadioButtonListBoxStyle}"
+                     SelectedValue="{Binding ActiveTool}"
+                     ItemsSource="{Binding CollectionTools}"
+                     PreviewMouseRightButtonDown="ListBox_PreviewMouseRightButtonDown">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="IsEnabled" Value="{Binding IsVisible}"/>
+                        <Setter Property="ContextMenuService.ShowOnDisabled" Value="True"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="ToolTip" Value="{Binding Category}"/>
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem IsCheckable="True"
+                                              IsChecked="{Binding IsVisible, Converter={StaticResource InverseConverter}}">
+                                        <MenuItem.Header>
+                                            <TextBlock Text="{Binding Category, StringFormat={}Hide {0}}"/>
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Color}" Value="{x:Null}">
+                                <Setter Property="ContextMenu" Value="{x:Null}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </ScrollViewer>
+    </Grid>
+</Window>

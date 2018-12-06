@@ -1,0 +1,33 @@
+Count Size: 10
+
+-- Counts and Inputs
+Count: Bull, Red
+Count: SAM, Pink
+Count: Fem, LightBlue
+Count: Juv, RoyalBlue
+Count: Pup, Green
+Count: DP, White
+Count: DNP, White
+
+Year:
+SiteName: 
+
+-- File columns
+File Columns: Filename, Bull, SAM, Fem, Juv, Pup, Dead Pup, Dead NonPup, Disturbed, Brands, Comments, Counter
+Values: FileName, Bull, SAM, Fem, Juv, Pup, DP, DNP, Disturbed, Brands, Comments, "JC"
+
+
+
+
+-- Database stuff
+Database Table: aerial.Count
+Columns: SurveySiteID, Initials, PhotoName, CountDate, Bull, SAM, Female, Juvenile, Pup, PupDead, NonPupDead, Comments
+Values: SurveySiteID, UserName, FileName, CurrentDate, Bull, SAM, Fem, Juv, Pup, DP, DNP, left("platform", 2)
+
+Reference Table: aerial.SurveySite
+Columns: SiteName, Year
+Values: SiteName, Year
+Return: SurveySiteID, platform
+
+
+Database Connection: Provider=SQLNCLI11;Server=.;Database=NMML_AEP_SSL;Trusted_Connection=yes;
